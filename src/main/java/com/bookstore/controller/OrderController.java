@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getById(@PathVariable Long id){
         return orderService.getById(id);
     }

@@ -37,10 +37,7 @@ public class JWTUtility {
     }
 
     public boolean validate(String token) {
-        if (getUsername(token) != null && !isExpired(token) && getAuthorities(token).size()!=0) {
-            return true;
-        }
-        return false;
+        return getUsername(token) != null && !isExpired(token) && !getAuthorities(token).isEmpty();
     }
 
     public String getUsername(String token) {

@@ -49,8 +49,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         accountRepository.findByUsername(userRegistrationDTO.getUsername())
                 .ifPresent(value -> {
-                    throw new UsernameAlreadyRegisteredException("has already been taken");
+                    throw new UsernameAlreadyRegisteredException("Username has already been taken");
                 });
+
 
         accountRepository.findByEmail(userRegistrationDTO.getEmail())
                 .ifPresent(value->{
@@ -98,7 +99,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(()->new NoResourceFoundException("account not found"));
-        return User.builder().build();
+        return new User(account.getUsername(), account.getPassword(), getUserRoles(account));
     }
 
     public List<SimpleGrantedAuthority> getUserRoles(Account account){
