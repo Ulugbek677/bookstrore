@@ -58,9 +58,11 @@ public class SecurityConfig {
                                         "/notices/**"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/genres").permitAll()
-                                .requestMatchers("/orders/**")
+                                .requestMatchers(HttpMethod.GET, "/orders")
                                 .authenticated()
-                                .anyRequest().hasAuthority("SUPER_ADMIN")
+                                .requestMatchers("/orders/**")
+                                .hasRole("ADMIN")
+                                .anyRequest().hasRole("SUPER_ADMIN")
 
         );
 

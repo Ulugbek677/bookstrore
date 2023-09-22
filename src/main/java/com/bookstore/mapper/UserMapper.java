@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
 
     private final JWTGeneratorService jwtGeneratorService;
-    private static final Role DEFAULT_USER_ROLE = new Role(2L, "USER", null);
+    private static final Role DEFAULT_USER_ROLE = new Role(3L, "USER", null);
 
     public Account toEntity(UserRegistrationDTO userRegister){
         return new Account(
