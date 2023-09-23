@@ -11,6 +11,9 @@ import com.bookstore.model.Role;
 import com.bookstore.repository.AccountRepository;
 import com.bookstore.repository.RoleRepository;
 import com.bookstore.service.AccountService;
+import com.bookstore.service.JWTGeneratorService;
+import com.bookstore.service.MailService;
+import com.bookstore.utility.JWTUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,16 +39,54 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final RoleRepository roleRepository;
     private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+
+    private final JWTUtility jwtUtility;
+    private final MailService mailService;
+    private final JWTGeneratorService jwtGeneratorService;
+
+
+
+//    @Override
+//    public ResponseEntity<UserRegistrationDTO> accountRegister(UserRegistrationDTO userRegistrationDTO) {
+//
+//
+//
+//        accountRepository.findByUsername(userRegistrationDTO.getUsername())
+//                .ifPresent(value -> {
+//                    throw new UsernameAlreadyRegisteredException("Username has already been taken");
+//                });
+//
+//
+//        accountRepository.findByEmail(userRegistrationDTO.getEmail())
+//                .ifPresent(value->{
+//                    throw new UsernameAlreadyRegisteredException("has already been taken");
+//                });
+//
+//        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+//
+//        Account account = accountRepository.save(userMapper.toEntity(userRegistrationDTO));
+//
+//
+//
+//        Authentication auth = new UsernamePasswordAuthenticationToken(
+//                account.getEmail(), null , getUserRoles(account)
+//        );
+//
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//
+//
+//
+//        return ResponseEntity.ok(userMapper.toDto(account));
+//
+//    }
+
 
 
 
     @Override
     public ResponseEntity<UserRegistrationDTO> accountRegister(UserRegistrationDTO userRegistrationDTO) {
-
-
 
         accountRepository.findByUsername(userRegistrationDTO.getUsername())
                 .ifPresent(value -> {
@@ -58,7 +99,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                     throw new UsernameAlreadyRegisteredException("has already been taken");
                 });
 
-        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
         Account account = accountRepository.save(userMapper.toEntity(userRegistrationDTO));
 
@@ -71,9 +111,30 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
 
+        // JWT token yaratish
+        String token = jwtGeneratorService.jwtGenerate();
+
+        // Tokenni foydalanuvchiga jo'natish (masalan, email orqali)
+        sendTokenToUserEmail(userRegistrationDTO.getEmail(), token);
+
+        // ...
 
         return ResponseEntity.ok(userMapper.toDto(account));
     }
+
+
+
+
+    private void sendTokenToUserEmail(String email, String token) {
+        String activationUrl = "http://localhost:8085/accounts/login";
+        String subject = "Account Activation";
+        String text = "To activate your account, please click on the following link:\n"
+                + activationUrl + "?token=" + token;
+
+        mailService.sendSimpleMessage(email, subject, text);
+    }
+
+
 
     @Override
     public ResponseEntity<UserRegistrationDTO> accountLogin(UserRegistrationDTO userRegistrationDTO) {
