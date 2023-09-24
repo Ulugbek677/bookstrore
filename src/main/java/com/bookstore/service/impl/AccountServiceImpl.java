@@ -1,6 +1,7 @@
 package com.bookstore.service.impl;
 import com.bookstore.config.SecurityConfig;
 import com.bookstore.customexseptions.NoResourceFoundException;
+import com.bookstore.customexseptions.TokenValidationException;
 import com.bookstore.customexseptions.UsernameAlreadyRegisteredException;
 import com.bookstore.dto.AccountDTO;
 import com.bookstore.dto.UserRegistrationDTO;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,7 +96,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                     throw new UsernameAlreadyRegisteredException("Username has already been taken");
                 });
 
-
         accountRepository.findByEmail(userRegistrationDTO.getEmail())
                 .ifPresent(value->{
                     throw new UsernameAlreadyRegisteredException("has already been taken");
@@ -102,22 +104,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         Account account = accountRepository.save(userMapper.toEntity(userRegistrationDTO));
 
-
-
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 account.getEmail(), null , getUserRoles(account)
         );
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-
-        // JWT token yaratish
         String token = jwtGeneratorService.jwtGenerate();
-
-        // Tokenni foydalanuvchiga jo'natish (masalan, email orqali)
         sendTokenToUserEmail(userRegistrationDTO.getEmail(), token);
 
-        // ...
 
         return ResponseEntity.ok(userMapper.toDto(account));
     }
@@ -125,8 +120,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
 
 
+    // Send email link with token
     private void sendTokenToUserEmail(String email, String token) {
-        String activationUrl = "http://localhost:8085/accounts/login";
+        String activationUrl = "http://localhost:8085/accounts/confirm";
         String subject = "Account Activation";
         String text = "To activate your account, please click on the following link:\n"
                 + activationUrl + "?token=" + token;
@@ -159,8 +155,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         Account account = accountRepository.findByEmail(email)
-                .orElseThrow(()->new NoResourceFoundException("account not found"));
+                .orElseThrow(()->new NoResourceFoundException("Account not found"));
         return new User(account.getUsername(), account.getPassword(), getUserRoles(account));
+
     }
 
     public List<SimpleGrantedAuthority> getUserRoles(Account account){
@@ -176,6 +173,33 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 .collect(Collectors.toList());
         return allRoles;
     }
+
+
+    //TODO check token
+
+    public String confirmToken(String token) {
+        try {
+            if (jwtUtility.validate(token)) {
+                String username = jwtUtility.getUsername(token);
+                Collection<? extends GrantedAuthority> authorities = jwtUtility.getAuthorities(token);
+                Authentication auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
+            } else {
+                throw new TokenValidationException("Token not valid");
+            }
+        } catch (Exception ex) {
+            log.info("Token validation exception {}", ex.getMessage());
+
+
+
+        }
+        return "confirmed";
+    }
+
+
+
 
 
 }

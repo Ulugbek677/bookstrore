@@ -12,4 +12,5 @@ public interface AccountService {
 
     ResponseEntity<UserRegistrationDTO> accountLogin(UserRegistrationDTO userRegistrationDTO);
 
+    String confirmToken(String token);
 }

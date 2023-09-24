@@ -21,6 +21,13 @@ public class AccountController {
         return accountService.accountRegister(userRegistrationDTO);
     }
 
+    //check token
+    @GetMapping("/confirm")
+    public String confirm(@RequestParam("token") String token) {
+        return accountService.confirmToken(token);
+    }
+
+
 
 
     @PostMapping("/login")
