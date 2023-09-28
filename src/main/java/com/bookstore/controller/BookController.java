@@ -42,5 +42,11 @@ public class BookController {
         return bookService.deleteBook(id);
     }
 
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadBook(@PathVariable Long id) {
+        return bookService.downloadBook(id);
+    }
+
+
 
 }

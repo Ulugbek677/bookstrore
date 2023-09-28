@@ -20,5 +20,5 @@ public interface BookService {
     ResponseEntity<List<BookDTO>> getGenreAllBook(GenreDTO genreDTO);
 
 
-
+    ResponseEntity<byte[]> downloadBook(Long id);
 }

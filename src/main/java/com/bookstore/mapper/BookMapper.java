@@ -18,7 +18,8 @@ public class BookMapper {
                 bookDTO.getTitle(),
                 bookDTO.getAuthor(),
                 genreMapper.toEntity(bookDTO.getGenreDTO()),
-                bookDTO.getDescription()
+                bookDTO.getDescription(),
+                bookDTO.getFileName()
         );
     }
     public BookDTO toDto(Book book){
@@ -27,7 +28,8 @@ public class BookMapper {
                 book.getTitle(),
                 book.getAuthor(),
                 genreMapper.toDTO(book.getGenre()),
-                book.getDescription()
+                book.getDescription(),
+                book.getFileName()
         );
     }
 }

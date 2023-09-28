@@ -42,6 +42,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 (request)->
                         request
+                                .requestMatchers("api/books/download/**")
+                                .permitAll()
                                 .requestMatchers(HttpMethod.POST, "api/books/**").hasAuthority("ADMIN")
                                 .requestMatchers("/accounts/register")
                                 .permitAll()
@@ -57,9 +59,9 @@ public class SecurityConfig {
                                         "/contacts/**",
                                         "/notices/**"
                                 ).permitAll()
+                                .requestMatchers(HttpMethod.GET,"/orders/**")
+                                .hasRole("USER")
                                 .requestMatchers(HttpMethod.GET, "/api/genres").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/orders")
-                                .authenticated()
                                 .requestMatchers("/orders/**")
                                 .hasRole("ADMIN")
                                 .anyRequest().hasRole("SUPER_ADMIN")

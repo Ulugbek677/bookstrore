@@ -20,4 +20,5 @@ public class Book {
     @ManyToOne
     private Genre genre;
     private String description;
+    private String fileName;
 }

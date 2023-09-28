@@ -11,11 +11,16 @@ import com.bookstore.repository.GenreRepository;
 import com.bookstore.response.ApiResponse;
 import com.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,5 +82,28 @@ public class BookServiceImpl implements BookService {
         return ResponseEntity.ok(bookByAndGenre
                 .stream().map(bookMapper::toDto)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadBook(Long id) {
+        Book book = bookRepository.findById(id).orElseThrow(()-> new NoResourceFoundException("Book not found"));
+
+        // Faylni serverdan olish
+        String fileName = book.getFileName();
+        Path filePath = Paths.get("/Users/ulugbek/booksPdf").resolve(fileName);
+
+        try {
+            byte[] fileContent = Files.readAllBytes(filePath);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(fileContent.length)
+                    .body(fileContent);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

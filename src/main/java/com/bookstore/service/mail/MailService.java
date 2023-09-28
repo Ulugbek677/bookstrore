@@ -1,4 +1,4 @@
-package com.bookstore.service;
+package com.bookstore.service.mail;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;

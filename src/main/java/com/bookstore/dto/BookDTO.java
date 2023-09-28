@@ -13,4 +13,5 @@ public class BookDTO {
     private String author;
     private GenreDTO genreDTO;
     private String description;
+    private String fileName;
 }

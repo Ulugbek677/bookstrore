@@ -1,11 +1,8 @@
 package com.bookstore.service.impl;
-import com.bookstore.config.SecurityConfig;
 import com.bookstore.customexseptions.NoResourceFoundException;
 import com.bookstore.customexseptions.TokenValidationException;
 import com.bookstore.customexseptions.UsernameAlreadyRegisteredException;
-import com.bookstore.dto.AccountDTO;
 import com.bookstore.dto.UserRegistrationDTO;
-import com.bookstore.mapper.AccountMapper;
 import com.bookstore.mapper.UserMapper;
 import com.bookstore.model.Account;
 import com.bookstore.model.Role;
@@ -13,7 +10,7 @@ import com.bookstore.repository.AccountRepository;
 import com.bookstore.repository.RoleRepository;
 import com.bookstore.service.AccountService;
 import com.bookstore.service.JWTGeneratorService;
-import com.bookstore.service.MailService;
+import com.bookstore.service.mail.MailService;
 import com.bookstore.utility.JWTUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +97,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 .ifPresent(value->{
                     throw new UsernameAlreadyRegisteredException("has already been taken");
                 });
-
+        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
         Account account = accountRepository.save(userMapper.toEntity(userRegistrationDTO));
 
@@ -156,7 +153,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(()->new NoResourceFoundException("Account not found"));
-        return new User(account.getUsername(), account.getPassword(), getUserRoles(account));
+        return User.builder().build();
 
     }
 

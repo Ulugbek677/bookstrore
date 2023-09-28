@@ -1,27 +1,32 @@
 package com.bookstore.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private Account user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     @ManyToOne
     private Book book;
     private LocalDate orderDate;
     private LocalDate isEnd;
+
+
+
+
 
 
 }

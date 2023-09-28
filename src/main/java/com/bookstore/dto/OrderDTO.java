@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class OrderDTO {
     private Long id;
-    private AccountDTO userDTO;
+    private AccountDTO accountDTO;
     private BookDTO bookDTO;
     private LocalDate orderDate;
     private LocalDate isEnd;

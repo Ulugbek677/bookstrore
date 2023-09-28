@@ -38,9 +38,9 @@ public class OrderController {
         return orderService.getOrdersByUserId(userId);
     }
 
-    @GetMapping("/user/{userId}/book/{bookId}")
-    public ResponseEntity<Order> getCurrentOrder(@PathVariable Long userId, @PathVariable Long bookId) {
-        return orderService.findOrderByUserIdAndBookId(userId, bookId);
+    @GetMapping("/current/{id}")
+    public ResponseEntity<Order> getCurrentOrder(@PathVariable  Long id) {
+        return orderService.findOrderByUserIdAndOrderId(id);
 
     }
 }

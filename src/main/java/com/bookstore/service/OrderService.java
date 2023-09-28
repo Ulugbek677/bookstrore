@@ -17,5 +17,5 @@ public interface OrderService {
     ResponseEntity<List<OrderDTO>> getOrdersByUserId(Long userId);
 
 
-    ResponseEntity<Order> findOrderByUserIdAndBookId(Long userId, Long bookId);
+    ResponseEntity<Order> findOrderByUserIdAndOrderId(Long id);
 }

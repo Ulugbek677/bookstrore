@@ -14,7 +14,7 @@ public class OrderMapper {
     public Order toEntity(OrderDTO orderDTO){
         return orderDTO == null ? null : new Order(
                 orderDTO.getId(),
-                userMapper.toEntity(orderDTO.getUserDTO()),
+                userMapper.toEntity(orderDTO.getAccountDTO()),
                 bookMapper.toEntity(orderDTO.getBookDTO()),
                 orderDTO.getOrderDate(),
                 null
@@ -22,9 +22,9 @@ public class OrderMapper {
     }
 
    public OrderDTO toDto(Order order){
-        return new OrderDTO(
+        return order == null ? null : new OrderDTO(
                 order.getId(),
-                userMapper.toDTO(order.getUser()),
+                userMapper.toDTO(order.getAccount()),
                 bookMapper.toDto(order.getBook()),
                 order.getOrderDate(),
                 null
