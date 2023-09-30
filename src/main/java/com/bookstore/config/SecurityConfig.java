@@ -44,6 +44,8 @@ public class SecurityConfig {
                         request
                                 .requestMatchers("api/books/download/**")
                                 .permitAll()
+                                .requestMatchers("api/books/upload")
+                                .permitAll()
                                 .requestMatchers(HttpMethod.POST, "api/books/**").hasAuthority("ADMIN")
                                 .requestMatchers("/accounts/register")
                                 .permitAll()

@@ -11,17 +11,22 @@ import com.bookstore.repository.GenreRepository;
 import com.bookstore.response.ApiResponse;
 import com.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -30,6 +35,8 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final GenreRepository genreRepository;
+    private static final String PATH_PDF = "/Users/ulugbek/booksPdf";
+
     @Override
     public ResponseEntity<BookDTO> getById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(()->new NoResourceFoundException());
@@ -88,9 +95,9 @@ public class BookServiceImpl implements BookService {
     public ResponseEntity<byte[]> downloadBook(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(()-> new NoResourceFoundException("Book not found"));
 
-        // Faylni serverdan olish
+        // TODO Retrieve the file from the server
         String fileName = book.getFileName();
-        Path filePath = Paths.get("/Users/ulugbek/booksPdf").resolve(fileName);
+        Path filePath = Paths.get(PATH_PDF).resolve(fileName);
 
         try {
             byte[] fileContent = Files.readAllBytes(filePath);
@@ -106,4 +113,22 @@ public class BookServiceImpl implements BookService {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @Override
+    public String uploadFile(MultipartFile file) {
+        Path uploadPath = Paths.get(PATH_PDF);
+
+        try {
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return "File uploaded successfully : " + fileName;
+        } catch (IOException e) {
+
+            return "Error occurred while uploading the file.\n : " + e.getMessage();
+        }
+    }
+
+
 }
